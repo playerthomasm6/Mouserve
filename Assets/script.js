@@ -2,7 +2,7 @@
 var addedCitiesList = [];
 
 $(document).ready(function () {
-    
+
     var addedCities = JSON.parse(localStorage.getItem("addedCities"));
     //Grabs cities from local storage and places them as buttons
     addCityButtons();
@@ -15,6 +15,13 @@ $(document).ready(function () {
 
         var citySearchValue = $(this).text();
         console.log(citySearchValue);
+
+        recentCity.push(
+            recentCityObj = {
+                name: citySearchValue,
+            },
+        );
+        localStorage.setItem("recentCity", JSON.stringify(recentCity));
 
         var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + citySearchValue + "&appid=8b5240010baf177d08076b9cccba48c3";
         console.log(queryURL);
@@ -93,12 +100,7 @@ $(document).ready(function () {
             });
         });
 
-        recentCity.push(
-                 recentCityObj = {
-                name: citySearchValue,
-            },
-        );
-        localStorage.setItem("recentCity", JSON.stringify(recentCity));
+
 
     });
 
@@ -229,91 +231,91 @@ $(document).ready(function () {
     // function that pulls the stored city buttons from local storage and places them on the page
     function addCityButtons() {
         var recentCity = JSON.parse(localStorage.getItem("recentCity"));
-        if (recentCity){
-        
-
-        var newCity = recentCity[0].name;
-
-        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + newCity + "&appid=8b5240010baf177d08076b9cccba48c3";
-        console.log(queryURL);
-        $.ajax({
-            url: queryURL,
-            method: "GET",
-        }).then(function (response) {
-            getCurrentDay();
-            console.log(response);
-            console.log(response.main.temp);
-            var tempF = ((response.main.temp - 273.15) * (9 / 5) + 32);
-
-            var iconId = response.weather[0].icon;
-
-            $("#weatherIcon").attr("src", "http://openweathermap.org/img/wn/" + iconId + ".png");
-            $("#cityToday").text(newCity);
-            $("#temp").text("Temperature: " + Math.floor(tempF) + "° F");
-            $("#humidy").text("Humidity: " + response.main.humidity + "%");
-            $("#wind-speed").text("Wind Speed: " + response.wind.speed + " mph");
-
-            // Grab API for UV Index
-            queryURL1 = "https://api.openweathermap.org/data/2.5/uvi?lat=" + response.coord.lat + "&lon=" + response.coord.lon + "&appid=503d1eeec1a82160fbba1e320befda5e";
+        if (recentCity) {
 
 
-            // 16-DAY FORECAST API REQUEST
-            var queryURL2 = "https://api.openweathermap.org/data/2.5/onecall?lat=" + response.coord.lat + "&lon=" + response.coord.lon + "&exclude=minutely,hourly,alerts&appid=8b5240010baf177d08076b9cccba48c3";
+            var newCity = recentCity[0].name;
 
-            console.log(response.coord.lon);
-            console.log(response.coord.lat);
-
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + newCity + "&appid=8b5240010baf177d08076b9cccba48c3";
+            console.log(queryURL);
             $.ajax({
-                url: queryURL2,
+                url: queryURL,
                 method: "GET",
             }).then(function (response) {
-                console.log(response);
-                $("#5day").empty();
                 getCurrentDay();
-
-                for (i = 0; i < 5; i++) {
-                    var newDiv1 = $("<div>").attr("class", "col-sm-2 forecast-container");
-
-                    var thisDay = currentDayArray[i];
-                    var thisDayEl = $("<h3>").attr("id", "dayoftheweek" + i);
-                    thisDayEl.text(thisDay);
-                    newDiv1.append(thisDayEl);
-                    console.log(thisDay);
-
-                    forecastIconId = response.daily[i].weather[0].icon;
-                    var foreCastIcon = $("<img>").attr("src", "http://openweathermap.org/img/wn/" + forecastIconId + ".png");
-                    foreCastIcon.attr("class", "forecastIcon")
-                    newDiv1.append(foreCastIcon);
-
-                    var dailymin = $("<p>").attr("id", i + "day");
-                    dailymin.text("Low: " + Math.floor(((response.daily[i].temp.min) - 273.15) * (9 / 5) + 32) + "° F");
-                    newDiv1.append(dailymin);
-
-                    var dailymax = $("<p>").attr("id", i + "day");
-                    dailymax.text("High: " + Math.floor(((response.daily[i].temp.max) - 273.15) * (9 / 5) + 32) + "° F");
-                    newDiv1.append(dailymax);
-
-                    $("#5day").append(newDiv1);
-
-
-                };
-            });
-
-
-
-
-            $.ajax({
-                url: queryURL1,
-                method: "GET",
-            }).then(function (response) {
                 console.log(response);
-                $("#UV-index").text("UV Index: " + response.value);
+                console.log(response.main.temp);
+                var tempF = ((response.main.temp - 273.15) * (9 / 5) + 32);
+
+                var iconId = response.weather[0].icon;
+
+                $("#weatherIcon").attr("src", "http://openweathermap.org/img/wn/" + iconId + ".png");
+                $("#cityToday").text(newCity);
+                $("#temp").text("Temperature: " + Math.floor(tempF) + "° F");
+                $("#humidy").text("Humidity: " + response.main.humidity + "%");
+                $("#wind-speed").text("Wind Speed: " + response.wind.speed + " mph");
+
+                // Grab API for UV Index
+                queryURL1 = "https://api.openweathermap.org/data/2.5/uvi?lat=" + response.coord.lat + "&lon=" + response.coord.lon + "&appid=503d1eeec1a82160fbba1e320befda5e";
+
+
+                // 16-DAY FORECAST API REQUEST
+                var queryURL2 = "https://api.openweathermap.org/data/2.5/onecall?lat=" + response.coord.lat + "&lon=" + response.coord.lon + "&exclude=minutely,hourly,alerts&appid=8b5240010baf177d08076b9cccba48c3";
+
+                console.log(response.coord.lon);
+                console.log(response.coord.lat);
+
+                $.ajax({
+                    url: queryURL2,
+                    method: "GET",
+                }).then(function (response) {
+                    console.log(response);
+                    $("#5day").empty();
+                    getCurrentDay();
+
+                    for (i = 0; i < 5; i++) {
+                        var newDiv1 = $("<div>").attr("class", "col-sm-2 forecast-container");
+
+                        var thisDay = currentDayArray[i];
+                        var thisDayEl = $("<h3>").attr("id", "dayoftheweek" + i);
+                        thisDayEl.text(thisDay);
+                        newDiv1.append(thisDayEl);
+                        console.log(thisDay);
+
+                        forecastIconId = response.daily[i].weather[0].icon;
+                        var foreCastIcon = $("<img>").attr("src", "http://openweathermap.org/img/wn/" + forecastIconId + ".png");
+                        foreCastIcon.attr("class", "forecastIcon")
+                        newDiv1.append(foreCastIcon);
+
+                        var dailymin = $("<p>").attr("id", i + "day");
+                        dailymin.text("Low: " + Math.floor(((response.daily[i].temp.min) - 273.15) * (9 / 5) + 32) + "° F");
+                        newDiv1.append(dailymin);
+
+                        var dailymax = $("<p>").attr("id", i + "day");
+                        dailymax.text("High: " + Math.floor(((response.daily[i].temp.max) - 273.15) * (9 / 5) + 32) + "° F");
+                        newDiv1.append(dailymax);
+
+                        $("#5day").append(newDiv1);
+
+
+                    };
+                });
+
+
+
+
+                $.ajax({
+                    url: queryURL1,
+                    method: "GET",
+                }).then(function (response) {
+                    console.log(response);
+                    $("#UV-index").text("UV Index: " + response.value);
+                });
             });
-        });
-    };
+        };
 
         // Grab my stored cities from local storage
-        
+
         var addedCities = JSON.parse(localStorage.getItem("addedCities"));
         if (addedCities) {
             // for loop to add the city buttons into the div
